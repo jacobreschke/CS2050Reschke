@@ -1,0 +1,74 @@
+#### IntelliJ IDEA ###
+#out/
+#!**/src/main/**/out/
+#!**/src/test/**/out/
+#
+#### Eclipse ###
+#.apt_generated
+#.classpath
+#.factorypath
+#.project
+#.settings
+#.springBeans
+#.sts4-cache
+#bin/
+#!**/src/main/**/bin/
+#!**/src/test/**/bin/
+#
+#### NetBeans ###
+#/nbproject/private/
+#/nbbuild/
+#/dist/
+#/nbdist/
+#/.nb-gradle/
+#
+#### VS Code ###
+#.vscode/
+#
+#### Mac OS ###
+#.DS_Store
+
+
+#######################
+# Eclipse / Java Setup
+#######################
+
+# --- Keep these tracked so projects import cleanly ---
+!.project
+!.classpath
+!.settings/
+!.settings/org.eclipse.jdt.core.prefs
+!.settings/org.eclipse.jdt.ui.prefs
+
+# --- Ignore Eclipse workspace cruft ---
+.metadata/
+.recommenders/
+.loadpath
+
+# --- Ignore build outputs ---
+bin/
+out/
+target/
+tmp/
+*.tmp
+*.bak
+*.swp
+
+# --- Ignore launch configs (often machine-specific) ---
+*.launch
+
+#######################
+# Other IDEs (optional)
+#######################
+.idea/
+.vscode/
+
+#######################
+# OS cruft
+#######################
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+Thumbs.db
