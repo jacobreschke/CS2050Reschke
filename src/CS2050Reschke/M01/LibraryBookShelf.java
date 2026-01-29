@@ -12,7 +12,6 @@ public class LibraryBookShelf {
         int shelfCapacity;
 
 
-
         Book[][] books;
         int filledCount = 0;
 
@@ -31,18 +30,18 @@ public class LibraryBookShelf {
             if (book == null) {
                 System.out.println("Invalid book.");
             } else {
-                    for (int i = 0; i < books.length; i++) {
-                        for (int j = 0; j < books[i].length; j++) {
-                            if (!placed && books[i][j] == null) {
-                                books[i][j] = book;
-                                filledCount++;
-                                // Output = Added "Unmasking AI" by Joy Buolamwini (2023) at shelf 1, slot 1
-                                System.out.println("Added " + books[i][j].stringOfBookDetails() + " at shelf " + (i + 1) + ", slot " + (j + 1));
-                                placed = true;
-                            }
+                for (int i = 0; i < books.length; i++) {
+                    for (int j = 0; j < books[i].length; j++) {
+                        if (!placed && books[i][j] == null) {
+                            books[i][j] = book;
+                            filledCount++;
+                            // Output = Added "Unmasking AI" by Joy Buolamwini (2023) at shelf 1, slot 1
+                            System.out.println("Added " + books[i][j].stringOfBookDetails() + " at shelf " + (i + 1) + ", slot " + (j + 1));
+                            placed = true;
                         }
                     }
                 }
+            }
             if (!placed) {
                 System.out.println("Library is full");
             }
@@ -82,7 +81,9 @@ public class LibraryBookShelf {
 
 
         private int findOldestBook() {
-            // Initialize to -1 then changing value to first non null book index year later
+            // Initialize to -1 then changing value to first non null book index year later in the code
+            // Did this to get rid of a dummy year and to make sure the loop tests
+            // against an actual data value
             int oldestBookYear = -1;
 
             for (int i = 0; i < books.length; i++) {
@@ -90,11 +91,13 @@ public class LibraryBookShelf {
                     if (books[i][j] != null) {
 
                         if (oldestBookYear == -1) {
-                            // set the initial value of oldestBookYear
+                            // set the initial value of oldestBookYear to the first non null value
                             oldestBookYear = books[i][j].getYear();
                         }
 
+
                         if (books[i][j].getYear() < oldestBookYear) {
+                            // comparing book index year to the current oldest year
                             oldestBookYear = books[i][j].getYear();
 
                         }
@@ -116,7 +119,7 @@ public class LibraryBookShelf {
                 System.out.println("Oldest books in " + libraryName);
                 System.out.println(oldestBookYear);
 
-                /// Loop to display the oldest books if year matches oldestBookYear
+                // Loop to display the oldest books that contain a year matching the oldestBookYear
                 for (int i = 0; i < books.length; i++) {
                     for (int j = 0; j < books[i].length; j++) {
                         if (books[i][j] != null && books[i][j].getYear() == oldestBookYear) {
