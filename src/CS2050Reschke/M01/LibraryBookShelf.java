@@ -5,17 +5,22 @@ public class LibraryBookShelf {
 
     public static class Library {
 
-        String libraryName;
+        private final String libraryName;
+        private final int numberOfShelves;
+        private final int shelfCapacity;
 
-        // make const?
-        int numberOfShelves;
-        int shelfCapacity;
-
-
-        Book[][] books;
-        int filledCount = 0;
+        // books can be final here because we are finalizing the size of the array not the contents of the array
+        private final Book[][] books;
+        private int filledCount = 0;
 
 
+        /**
+         * Constructs a library with name, shelves, and shelf capacity on creation.
+         *
+         * @param libraryName Name of the library
+         * @param numberOfShelves Number of shelves in the library (row)
+         * @param shelfCapacity Number of slots per shelf (column)
+         */
         Library(String libraryName, int numberOfShelves, int shelfCapacity) {
             this.libraryName = libraryName;
             this.numberOfShelves = numberOfShelves;
@@ -23,31 +28,46 @@ public class LibraryBookShelf {
             books = new Book[numberOfShelves][shelfCapacity];
         }
 
-
+        /**
+         * Adds a book to the first empty(null) index value in the library.
+         * if book is null print an error message.
+         * if library is full print full message.
+         *
+         * @param book Book object to add
+         */
         public void addBook(Book book) {
+            // placed to control adding the book
             boolean placed = false;
+            // validBook for null check
+            boolean validBook = book != null;
 
-            if (book == null) {
+            // if book is null tell user
+            if (!validBook) {
                 System.out.println("Invalid book.");
             } else {
+                // else look through shelf
                 for (int i = 0; i < books.length; i++) {
                     for (int j = 0; j < books[i].length; j++) {
+                        // find first null index and only add if book hasnt been placed
                         if (!placed && books[i][j] == null) {
                             books[i][j] = book;
                             filledCount++;
-                            // Output = Added "Unmasking AI" by Joy Buolamwini (2023) at shelf 1, slot 1
                             System.out.println("Added " + books[i][j].stringOfBookDetails() + " at shelf " + (i + 1) + ", slot " + (j + 1));
                             placed = true;
                         }
                     }
                 }
             }
-            if (!placed) {
+            // if the book is not null and we werent able to find a null index in the array
+            // tell user the library is full
+            if (validBook && !placed) {
                 System.out.println("Library is full");
             }
         }
 
-
+        /**
+         * Displays the number of books stored per shelf.
+         */
         void displayCountPerShelf() {
             for (int i = 0; i < books.length; i++) {
 
@@ -62,9 +82,12 @@ public class LibraryBookShelf {
             }
         }
 
+        /**
+         * Displays the books in the library along with the shelf and index location.
+         */
         void printAllBooks() {
             System.out.println("------------------------------------------------------------");
-            System.out.println("All books in Test Library");
+            System.out.println("All books in " + libraryName);
             System.out.println("Shelf   Slot   Book Details");
             System.out.println("------------------------------------------------------------");
 
@@ -80,8 +103,13 @@ public class LibraryBookShelf {
         }
 
 
+        /**
+         * Finds the year of the oldest book in the library.
+         * @return year of the oldest book, or -1 if library is empty
+         */
         private int findOldestBook() {
-            // Initialize to -1 then changing value to first non null book index year later in the code
+            // Initialize to -1 meaning the value isnt set yet
+            // then changing value to first non null book index year in the code
             // Did this to get rid of a dummy year and to make sure the loop tests
             // against an actual data value
             int oldestBookYear = -1;
@@ -108,6 +136,9 @@ public class LibraryBookShelf {
             return oldestBookYear;
         }
 
+        /**
+         * Displays the oldest book/book in library based on year unless its empty.
+         */
         public void displayOldest() {
             int oldestBookYear = findOldestBook();
 
@@ -142,24 +173,46 @@ public class LibraryBookShelf {
         private final int publishYear;
 
 
+        /**
+         * Creates a book with a title, author, and publish year.
+         * @param title title of the book
+         * @param author the author of the book
+         * @param publishYear the year the book was published
+         */
         Book(String title, String author, int publishYear) {
             this.title = title;
             this.author = author;
             this.publishYear = publishYear;
         }
 
+        /**
+         * Returns the title of the book.
+         * @return title
+         */
         String getTitle() {
             return title;
         }
 
+        /**
+         * Returns the author of the book.
+         * @return author
+         */
         String getAuthor() {
             return author;
         }
 
+        /**
+         * returns the year of the book.
+         * @return publish year
+         */
         int getYear() {
             return publishYear;
         }
 
+        /**
+         * returns a string of the books details.
+         * @return formatted string of details
+         */
         public String stringOfBookDetails() {
             return ('"' + title + '"' + " by " + author + " (" + publishYear + ")");
         }
@@ -215,6 +268,8 @@ public class LibraryBookShelf {
         // This will fill the 12th slot not the out of bounds index so I added an extra addBook to test full capacity
         library.addBook(new Book("Extra Title", "Extra Author", 2024)); // should trigger "full" message
         library.addBook(new Book("Extra Title2", "Extra Author2", 2024)); // should trigger "full" message
+        // Also threw in a null book to test my addBook() preventing a null book triggering a full library
+        library.addBook(null);
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
