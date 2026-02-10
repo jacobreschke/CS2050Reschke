@@ -138,7 +138,7 @@ class Library {
     /**
      * Displays the number of books stored per shelf.
      */
-    void displayCountPerShelf() {
+    public void displayCountPerShelf() {
         for (int i = 0; i < bookShelf.length; i++) {
 
             System.out.print("Shelf " + (i + 1) + " has ");
@@ -155,7 +155,7 @@ class Library {
     /**
      * Displays the books in the library along with the shelf and index location.
      */
-    void printAllBooks() {
+    public void printAllBooks() {
         System.out.println("------------------------------------------------------------");
         System.out.println("All books in " + getName());
         System.out.println("Shelf   Slot   Book Details");
@@ -320,7 +320,7 @@ class Book {
      *
      * @return title
      */
-    String getTitle() {
+    public String getTitle() {
         return this.title;
     }
 
@@ -329,7 +329,7 @@ class Book {
      *
      * @return author
      */
-    String getAuthor() {
+    public String getAuthor() {
         return this.author;
     }
 
@@ -338,7 +338,7 @@ class Book {
      *
      * @return publish year
      */
-    int getYear() {
+    public int getYear() {
         return this.publishYear;
     }
 
