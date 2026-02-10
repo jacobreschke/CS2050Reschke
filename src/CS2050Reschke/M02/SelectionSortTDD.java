@@ -25,10 +25,21 @@ public class SelectionSortTDD {
 
 
     public static void selectionSort(int[] array) {
-        int lowestIndex = 0;
-        for (int i = 0; i < array.length; i++) {
-            System.out.println(array[i]);
+
+        for (int i = 0; i < array.length - 1; i++) {
+            int currentMin = array[i];
+            int currentMinIndex = i;
+            for (int j = i + 1; j < array.length; j++) {
+                if (array[j] < currentMin) {
+                    currentMin = array[j];
+                    currentMinIndex = j;
+                }
+            }
+            int tempNum = array[i];
+            array[i] = array[currentMinIndex];
+            array[currentMinIndex] = tempNum;
         }
+
 
     }
 
