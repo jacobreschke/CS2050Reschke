@@ -1,4 +1,4 @@
-package CS2050Reschke.M02;
+package CS2050Reschke.M02.Week1;
 
 import java.util.Arrays;
 import java.util.Scanner;

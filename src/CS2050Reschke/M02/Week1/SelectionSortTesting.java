@@ -1,4 +1,4 @@
-package CS2050Reschke.M02;
+package CS2050Reschke.M02.Week1;
 
 public class SelectionSortTesting {
 

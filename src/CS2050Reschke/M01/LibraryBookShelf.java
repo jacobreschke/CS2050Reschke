@@ -196,13 +196,11 @@ class Library {
                         oldestBookYear = bookShelf[i][j].getYear();
                     }
 
-
                     if (bookShelf[i][j].getYear() < oldestBookYear) {
                         // comparing book index year to the current oldest year
                         oldestBookYear = bookShelf[i][j].getYear();
 
                     }
-
                 }
             }
         }
@@ -218,7 +216,6 @@ class Library {
         if (currentShelf == 0 && currentSlot == 0) {
             System.out.println("Display Oldest: Library is empty.");
         } else {
-
 
             System.out.println("Oldest books in " + getName());
             System.out.println("Earliest publication year: " + oldestBookYear);
