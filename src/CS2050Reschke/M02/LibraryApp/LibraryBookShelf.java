@@ -5,14 +5,29 @@ public class LibraryBookShelf {
 
 
     public static void main(String[] args) {
-        // --- unit test checks for Book ---
+        // test PrintBook
         System.out.println("Unit Test Book Class");
-        Book unitTestBook = new Book("Unmasking AI", "Joy Buolamwini", 2023);
-        System.out.println("getTitle():   " + unitTestBook.getTitle());
-        System.out.println("getAuthor():  " + unitTestBook.getAuthor());
-        System.out.println("getYear():    " + unitTestBook.getYear());
-        System.out.println("stringOfBookDetails():   " + unitTestBook.stringOfBookDetails());
+        PrintBook unitTestPrintBook = new PrintBook("Unmasking AI", "Joy Buolamwini", 2023);
+        System.out.println("getTitle(): " + unitTestPrintBook.getTitle());
+        System.out.println("getAuthor(): " + unitTestPrintBook.getAuthor());
+        System.out.println("getYear(): " + unitTestPrintBook.getYear());
+        System.out.println("toString(): " + unitTestPrintBook);
+        System.out.println("getLoanDays(): " + unitTestPrintBook.getLoanDays());
+        System.out.println("getDailyLateFee(): $" + unitTestPrintBook.getDailyLateFee());
+        System.out.println("calculateLateFee(5): $" + unitTestPrintBook.calculateLateFee(5));
         System.out.println();
+
+        // test Ebook
+        EBook unitTestEBook = new EBook("Deep Learning", "Ian Goodfellow", 2016);
+        System.out.println("getTitle(): " + unitTestEBook.getTitle());
+        System.out.println("getAuthor(): " + unitTestEBook.getAuthor());
+        System.out.println("getYear(): " + unitTestEBook.getYear());
+        System.out.println("toString(): " + unitTestEBook);
+        System.out.println("getLoanDays(): " + unitTestEBook.getLoanDays());
+        System.out.println("getDailyLateFee(): $" + unitTestEBook.getDailyLateFee());
+        System.out.println("calculateLateFee(5): $" + unitTestEBook.calculateLateFee(5));
+        System.out.println();
+
         System.out.println("Setting up Test Library");
         int numberOfShelves = 3;
         int shelfCapacity = 4;
@@ -20,40 +35,47 @@ public class LibraryBookShelf {
         System.out.println("Slots per shelf (columns): " + shelfCapacity);
         System.out.println("Total capacity: " + (numberOfShelves * shelfCapacity));
         System.out.println();
+
         Library library = new Library("Test Library", numberOfShelves, shelfCapacity);
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
+
         // Row 0
-        library.addBook(null);
-        library.addBook(new Book("Unmasking AI", "Joy Buolamwini", 2023));
-        library.addBook(new Book("Hello World", "Hannah Fry", 2018));
-        library.addBook(new Book("Race After Technology", "Ruha Benjamin", 2019));
-        library.addBook(new Book("Deep Learning", "Ian Goodfellow", 2016));
+        library.addBook(null); // should fail
+        library.addBook(new PrintBook("Unmasking AI", "Joy Buolamwini", 2023));
+        library.addBook(new EBook("Hello World", "Hannah Fry", 2018));
+        library.addBook(new PrintBook("Race After Technology", "Ruha Benjamin", 2019));
+        library.addBook(new EBook("Deep Learning", "Ian Goodfellow", 2016));
+
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
-        // Row 1
-        library.addBook(new Book("Algorithms to Live By", "Brian Christian", 2016));
-        library.addBook(new Book("Weapons of Math Destruction", "Cathy O'Neil", 2016));
-        library.addBook(new Book("The Mythical Man-Month", "Fred Brooks", 1975));
-        library.addBook(new Book("Refactoring", "Martin Fowler", 1999));
 
+        // Row 1
+        library.addBook(new PrintBook("Algorithms to Live By", "Brian Christian", 2016));
+        library.addBook(new EBook("Weapons of Math Destruction", "Cathy O'Neil", 2016));
+        library.addBook(new PrintBook("The Mythical Man-Month", "Fred Brooks", 1975));
+        library.addBook(new EBook("Refactoring", "Martin Fowler", 1999));
 
         // Row 2
-        library.addBook(new Book("The Pragmatic Programmer", "Andrew Hunt & David Thomas", 1999));
-        library.addBook(new Book("Peopleware", "Tom DeMarco & Tim Lister", 1987));
-        library.addBook(new Book("Computer Lib / Dream Machines", "Ted Nelson", 1975));
+        library.addBook(new PrintBook("The Pragmatic Programmer", "Andrew Hunt & David Thomas", 1999));
+        library.addBook(new EBook("Peopleware", "Tom DeMarco & Tim Lister", 1987));
+        library.addBook(new PrintBook("Computer Lib / Dream Machines", "Ted Nelson", 1975));
+        library.addBook(new EBook("Clean Code", "Robert Martin", 2008));
+
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
+
         System.out.println();
         System.out.println("Test add more books than capacity...");
-        // This will fill the 12th slot not the out of bounds index so I added an extra addBook to test full capacity
-        library.addBook(new Book("Extra Title", "Extra Author", 2024)); // should trigger "full" message
-        library.addBook(new Book("Extra Title2", "Extra Author2", 2024)); // should trigger "full" message
-        // Also threw in a null book to test my addBook() preventing a null book triggering a full library
+
+        // adding beyond capacity and null
+        library.addBook(new PrintBook("Extra Title", "Extra Author", 2024));  // Should trigger "full" message
+        library.addBook(new EBook("Extra Title2", "Extra Author2", 2024));    // Should trigger "full" message
         library.addBook(null);
+
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
@@ -380,28 +402,22 @@ abstract class Book {
 
     }
 
-    public double calculateLateFee(int daysLate) {
+    public final double calculateLateFee(int daysLate) {
         double lateFee = 0;
+        if (daysLate > 0){
+            lateFee = daysLate * getDailyLateFee();
+        }
         return lateFee;
+
     }
 
     abstract int getLoanDays();
-
     abstract double getDailyLateFee();
+    public abstract String getBookType();
 
 
-
-    /**
-     * returns a string of the books details.
-     *
-     * @return formatted string of details
-     */
-    public String stringOfBookDetails() {
-        return ('"' + title + '"' + " by " + author + " (" + publishYear + ")");
-    }
 
     // toString override
-    @Override
     public String toString() {
         return ('"' + title + '"' + " by " + author + " (" + publishYear + ")");
     }
@@ -410,21 +426,30 @@ abstract class Book {
 
 class PrintBook extends Book {
 
+    private String bookType = "Print";
+    private int loanDays = 21;
+    private double dailyLateFee = .25;
+
     PrintBook(String title, String author, int publishYear) {
         super(title, author, publishYear);
     }
 
     @Override
-    public String toString() {
-        return super.toString();
+    public String getBookType() {
+        return bookType;
     }
 
     public int getLoanDays() {
-        return 21;
+        return loanDays;
     }
 
     public double getDailyLateFee() {
-        return .25;
+        return dailyLateFee;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [" + getBookType() + ", " + getLoanDays() + " days, $" + getDailyLateFee() + "/day]";
     }
 
 }
@@ -433,24 +458,32 @@ class PrintBook extends Book {
 
 class EBook extends Book {
 
+    private String bookType = "EBook";
+    private int loanDays = 14;
+    private double dailyLateFee = .10;
 
     EBook(String title, String author, int publishYear) {
         super(title, author, publishYear);
     }
 
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 
     public int getLoanDays() {
-        return 14;
+        return loanDays;
     }
 
     public double getDailyLateFee() {
-        return .10;
+        return dailyLateFee;
     }
 
+    @Override
+    public String getBookType() {
+        return bookType;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [" + getBookType() + ", " + getLoanDays() + " days, $" + getDailyLateFee() + "/day]";
+    }
 
 }

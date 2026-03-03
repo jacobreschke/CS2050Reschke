@@ -34,7 +34,7 @@ public class M02SearchAnalysis
 			// -----------------------------
 			// BINARY SEARCH TEST CASES
 			// -----------------------------
-			int binaryBestKey = data[n / 2]; // best: mid element found immediately
+			int binaryBestKey = data[n / 2] - 1; // best: mid element found immediately
 			int binaryMiddleKey = data[n / 4]; // middle-ish: usually a few steps
 			int binaryWorstFoundKey = data[0]; // often near worst found case (end of range)
 			int binaryWorstNotFoundKey = n + 10; // worst (not found): absent
