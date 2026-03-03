@@ -1,10 +1,18 @@
 package CS2050Reschke.M02.LibraryApp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
 public class LibraryBookShelf {
 
 
 
     public static void main(String[] args) {
+
+
         // test PrintBook
         System.out.println("Unit Test Book Class");
         PrintBook unitTestPrintBook = new PrintBook("Unmasking AI", "Joy Buolamwini", 2023);
@@ -79,8 +87,28 @@ public class LibraryBookShelf {
         library.displayCountPerShelf();
         library.printAllBooks();
         library.displayOldest();
+
+
     }// end main
 
+
+    // Main using load from csv
+/*
+    public static void main(String[] args) {
+
+        int numberOfShelves = 3;
+        int shelfCapacity = 4;
+
+        Library library = new Library("Test Library", numberOfShelves, shelfCapacity);
+
+        System.out.println("Loading books from CSV...");
+        BookLoader.loadFromCsv(library, "books_test.csv");
+
+        library.displayCountPerShelf();
+        library.printAllBooks();
+        library.displayOldest();
+    }
+*/
 
 }
 
@@ -108,6 +136,25 @@ class Library {
         setNumberOfShelves(numberOfShelves);
         setShelfCapacity(shelfCapacity);
         setBookShelf();
+    }
+
+
+    public void writeAllBooksToFile(String filename) {
+        File outputFile = new File(filename);
+        try (PrintWriter writer = new PrintWriter(outputFile)) {
+            writer.println("Library Books");
+            for (int i = 0; i < bookShelf.length; i++) {
+                for (int j = 0; j < bookShelf[i].length; j++) {
+                    writer.println(bookShelf[i][j].toString());
+
+                }
+
+            }
+            System.out.println("Library contents saved to " + outputFile.getAbsolutePath());
+        } catch (IOException exception) {
+            System.out.println("Error writing to file: " + filename);
+            System.out.println("Reason: " + exception.getMessage());
+        }
     }
 
 
@@ -364,6 +411,7 @@ abstract class Book {
     /**
      * Checks the title input to ensure it is not null or empty
      * then assigns the value to the book. If null/empty assign Default title
+     *
      * @param title title of the book
      */
     private void setTitle(String title) {
@@ -377,6 +425,7 @@ abstract class Book {
     /**
      * Checks if the author input isnt null or empty then
      * assignt the value to the book. If null.empty assign default to title
+     *
      * @param author author of the book
      */
     private void setAuthor(String author) {
@@ -391,6 +440,7 @@ abstract class Book {
     /**
      * Checks if the year input is greater than or equal to 0. If it is
      * then it will assign the year to the book. if less than 0 default value is 0
+     *
      * @param year year of the book
      */
     private void setYear(int year) {
@@ -404,7 +454,7 @@ abstract class Book {
 
     public final double calculateLateFee(int daysLate) {
         double lateFee = 0;
-        if (daysLate > 0){
+        if (daysLate > 0) {
             lateFee = daysLate * getDailyLateFee();
         }
         return lateFee;
@@ -412,9 +462,10 @@ abstract class Book {
     }
 
     abstract int getLoanDays();
-    abstract double getDailyLateFee();
-    public abstract String getBookType();
 
+    abstract double getDailyLateFee();
+
+    public abstract String getBookType();
 
 
     // toString override
@@ -454,8 +505,6 @@ class PrintBook extends Book {
 
 }
 
-
-
 class EBook extends Book {
 
     private String bookType = "EBook";
@@ -465,7 +514,6 @@ class EBook extends Book {
     EBook(String title, String author, int publishYear) {
         super(title, author, publishYear);
     }
-
 
 
     public int getLoanDays() {
@@ -487,3 +535,137 @@ class EBook extends Book {
     }
 
 }
+
+class BookLoader {
+    /**
+     * Loads books from a CSV file and adds valid entries to the given library.
+     * <p>
+     * CSV format (no header row): title,author,year,type - type must be P
+     * (PrintBook) or E (EBook)
+     * <p>
+     * Safe input goals for intro: 1) Handle missing file (FileNotFoundException) 2)
+     * Validate basic structure (4 fields) 3) Safely parse year
+     * (NumberFormatException) 4) Validate year range and type 5) Skip invalid lines
+     * without crashing 6) Print a summary report at the end
+     */
+    public static void loadFromCsv(Library library, String filename) {
+        // Defensive check to ensure library object
+        if (library == null) {
+            System.out.println("LibraryLoader: library is null. Cannot load file.");
+            return;
+        }
+        // ----------------------------
+        // Summary counters
+        // ----------------------------
+        int totalLinesRead = 0;
+        int blankLinesSkipped = 0;
+        int invalidLinesSkipped = 0;
+        int booksAdded = 0;
+        int addFailures = 0; // library full or addBook rejected
+        try (Scanner fileScan = new Scanner(new File(filename))) {
+            while (fileScan.hasNextLine()) {
+                String line = fileScan.nextLine();
+                totalLinesRead = totalLinesRead + 1;
+                boolean shouldProcess = true;
+                // 1) Skip blank lines (keep loop structured: no continue/break)
+                if (line == null || line.trim().isEmpty()) {
+                    shouldProcess = false;
+                    blankLinesSkipped = blankLinesSkipped + 1;
+                }
+                // 2) Parse and add the book if the line is not blank
+                if (shouldProcess) {
+                    Book parsedBook = parseBookLine(line, totalLinesRead);
+                    if (parsedBook == null) {
+                        // parseBookLine already printed why it failed
+                        invalidLinesSkipped = invalidLinesSkipped + 1;
+                    } else {
+                        boolean added = library.addBook(parsedBook);
+                        if (added) {
+                            booksAdded = booksAdded + 1;
+                        } else {
+                            addFailures = addFailures + 1;
+                            System.out.println("Line " + totalLinesRead + ": could not add book (library may be full).");
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("Could not open file: " + filename);
+            return; // stop if file cannot be opened
+        }
+        // ----------------------------
+        // Summary report (after reading file)
+        // ----------------------------
+        System.out.println();
+        System.out.println("------------------------------------------------------------");
+        System.out.println("File Load Summary: " + filename);
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Total lines read:            " + totalLinesRead);
+        System.out.println("Blank lines skipped:         " + blankLinesSkipped);
+        System.out.println("Invalid lines skipped:       " + invalidLinesSkipped);
+        System.out.println("Books successfully added:    " + booksAdded);
+        System.out.println("Add failures (library full): " + addFailures);
+        System.out.println("------------------------------------------------------------");
+        System.out.println();
+    }
+
+    private static Book parseBookLine(String line, int lineNumber) {
+        String[] parts = line.split(",");
+
+        if (parts.length != 4) {
+            System.out.println("Line " + lineNumber + ": wrong number of fields (need 4) → " + line);
+            return null;
+        }
+        String titleText = parts[0].trim();
+        String authorText = parts[1].trim();
+        String yearText = parts[2].trim();
+        String typeText = parts[3].trim();
+
+        if (titleText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing title");
+            return null;
+        }
+
+        if (authorText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing author");
+            return null;
+        }
+
+        if (yearText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing year");
+            return null;
+        }
+
+        if (typeText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing type");
+            return null;
+        }
+
+        int year;
+        try
+        {
+            year = Integer.parseInt(yearText);
+
+        } catch (NumberFormatException ex)
+        {
+            System.out.println("Line " + lineNumber + ": year is not a number → \"" + yearText + "\"");
+            return null;
+        }
+
+        if (typeText.equalsIgnoreCase("P")) {
+            return new PrintBook(titleText, authorText, year);
+        } else if (typeText.equalsIgnoreCase("E")) {
+            return new EBook(titleText, authorText, year);
+        } else {
+            System.out.println("Line " + lineNumber + ": unknown book type → " + typeText);
+            return null;
+        }
+
+    }
+
+}
+
+
+
+
+
