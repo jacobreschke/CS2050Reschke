@@ -139,25 +139,6 @@ class Library {
     }
 
 
-    public void writeAllBooksToFile(String filename) {
-        File outputFile = new File(filename);
-        try (PrintWriter writer = new PrintWriter(outputFile)) {
-            writer.println("Library Books");
-            for (int i = 0; i < bookShelf.length; i++) {
-                for (int j = 0; j < bookShelf[i].length; j++) {
-                    writer.println(bookShelf[i][j].toString());
-
-                }
-
-            }
-            System.out.println("Library contents saved to " + outputFile.getAbsolutePath());
-        } catch (IOException exception) {
-            System.out.println("Error writing to file: " + filename);
-            System.out.println("Reason: " + exception.getMessage());
-        }
-    }
-
-
     /**
      * Adds a book to the library based on the currentSlot variable
      * handles currentShelf and currentSlot logic
@@ -662,6 +643,27 @@ class BookLoader {
         }
 
     }
+
+
+
+    public void writeAllBooksToFile(Book[][] bookShelf, String filename) {
+        File outputFile = new File(filename);
+        try (PrintWriter writer = new PrintWriter(outputFile)) {
+            writer.println("Library Books");
+            for (int i = 0; i < bookShelf.length; i++) {
+                for (int j = 0; j < bookShelf[i].length; j++) {
+                    writer.println(bookShelf[i][j].toString());
+
+                }
+
+            }
+            System.out.println("Library contents saved to " + outputFile.getAbsolutePath());
+        } catch (IOException exception) {
+            System.out.println("Error writing to file: " + filename);
+            System.out.println("Reason: " + exception.getMessage());
+        }
+    }
+
 
 }
 
