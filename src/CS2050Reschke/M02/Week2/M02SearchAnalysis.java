@@ -75,6 +75,7 @@ public class M02SearchAnalysis
 		return comparisons; // not found
 	}
 
+
 	// ---------- Binary Search: return comparisons ----------
 	// Counts each comparison between data[mid] and key as one comparison.
 	public static int binarySearchComparisons(int[] data, int key)
@@ -106,3 +107,4 @@ public class M02SearchAnalysis
 		return comparisons; // not found
 	}
 }
+

@@ -202,6 +202,7 @@ class Library {
         }
     }
 
+
     /**
      * Displays the books in the library along with the shelf and index location.
      */
@@ -433,6 +434,13 @@ abstract class Book {
 
     }
 
+    /**
+     * Calculates the late fee based on how many days the book is overdue.
+     * If daysLate is 0 or less, the fee is 0.
+     *
+     * @param daysLate number of overdue days
+     * @return total late fee owed
+     */
     public final double calculateLateFee(int daysLate) {
         double lateFee = 0;
         if (daysLate > 0) {
@@ -442,19 +450,35 @@ abstract class Book {
 
     }
 
+    /**
+     *Returns the number of days this book type can be borrowed.
+     * @return loan period in days
+     */
     abstract int getLoanDays();
 
+    /**
+     * Returns the late fee charged per day for this book type.
+     * @return daily late fee
+     */
     abstract double getDailyLateFee();
 
+    /**
+     * Returns book type
+     * @return book type as a string
+     */
     public abstract String getBookType();
 
 
-    // toString override
+    /**
+     * Returns a string of the book details
+     * @return formatted book description
+     */
     public String toString() {
         return ('"' + title + '"' + " by " + author + " (" + publishYear + ")");
     }
 
 }
+
 
 class PrintBook extends Book {
 
@@ -462,23 +486,46 @@ class PrintBook extends Book {
     private int loanDays = 21;
     private double dailyLateFee = .25;
 
+    /**
+     * Creates a PrintBook with a title, author, and publish year.
+     *
+     * @param title title of the book
+     * @param author author of the book
+     * @param publishYear year the book was published
+     */
     PrintBook(String title, String author, int publishYear) {
         super(title, author, publishYear);
     }
 
+    /**
+     * returns the book type
+     * @return "Print"
+     */
     @Override
     public String getBookType() {
         return bookType;
     }
 
+    /**
+     * Returns the number of loan days for a print book
+     * @return loan period in days
+     */
     public int getLoanDays() {
         return loanDays;
     }
 
+    /**
+     * Returns the daily late fee for a print book
+     * @return daily late fee
+     */
     public double getDailyLateFee() {
         return dailyLateFee;
     }
 
+    /**
+     * tostring override
+     * @return formatted book details
+     */
     @Override
     public String toString() {
         return super.toString() + " [" + getBookType() + ", " + getLoanDays() + " days, $" + getDailyLateFee() + "/day]";
@@ -492,24 +539,47 @@ class EBook extends Book {
     private int loanDays = 14;
     private double dailyLateFee = .10;
 
+    /**
+     * Creates an EBook with a title, author, and publish year.
+     *
+     * @param title title of the book
+     * @param author author of the book
+     * @param publishYear year the book was published
+     */
     EBook(String title, String author, int publishYear) {
         super(title, author, publishYear);
     }
 
 
+    /**
+     * Returns the number of Loan days for an ebook
+     * @return loan period in days
+     */
     public int getLoanDays() {
         return loanDays;
     }
 
+    /**
+     * Returns the faily late fee for an ebook
+     * @return dailt late fee
+     */
     public double getDailyLateFee() {
         return dailyLateFee;
     }
 
+    /**
+     * Returns the book type
+     * @return EBook
+     */
     @Override
     public String getBookType() {
         return bookType;
     }
 
+    /**
+     * tostring override
+     * @return formatted ebook description
+     */
     @Override
     public String toString() {
         return super.toString() + " [" + getBookType() + ", " + getLoanDays() + " days, $" + getDailyLateFee() + "/day]";
@@ -531,6 +601,7 @@ class BookLoader {
      */
     public static void loadFromCsv(Library library, String filename) {
         // Defensive check to ensure library object
+        // Without this the method would throw a nullptr exception
         if (library == null) {
             System.out.println("LibraryLoader: library is null. Cannot load file.");
             return;
@@ -538,12 +609,15 @@ class BookLoader {
         // ----------------------------
         // Summary counters
         // ----------------------------
+        // counters used for a summary at the end of file processing
         int totalLinesRead = 0;
         int blankLinesSkipped = 0;
         int invalidLinesSkipped = 0;
         int booksAdded = 0;
         int addFailures = 0; // library full or addBook rejected
+        // Putting Scanner in a try auto closes even if exception happens
         try (Scanner fileScan = new Scanner(new File(filename))) {
+            // one line at a time
             while (fileScan.hasNextLine()) {
                 String line = fileScan.nextLine();
                 totalLinesRead = totalLinesRead + 1;
@@ -560,6 +634,7 @@ class BookLoader {
                         // parseBookLine already printed why it failed
                         invalidLinesSkipped = invalidLinesSkipped + 1;
                     } else {
+                        // Adds the book
                         boolean added = library.addBook(parsedBook);
                         if (added) {
                             booksAdded = booksAdded + 1;
@@ -590,6 +665,14 @@ class BookLoader {
         System.out.println();
     }
 
+    /**
+     * Oarses a CSV line into a Book object, if the line is valid
+     * Format: title,author,year,type
+     * Type must be P for PrintBook or E for EBook
+     * @param line line of the file
+     * @param lineNumber the line number of the file
+     * @return A Book object if valid, null if invalid
+     */
     private static Book parseBookLine(String line, int lineNumber) {
         String[] parts = line.split(",");
 
@@ -645,17 +728,21 @@ class BookLoader {
     }
 
 
-
+    /**
+     * Writes all books from the bookshelf array to a file
+     * @param bookShelf
+     * @param filename
+     */
     public void writeAllBooksToFile(Book[][] bookShelf, String filename) {
         File outputFile = new File(filename);
         try (PrintWriter writer = new PrintWriter(outputFile)) {
             writer.println("Library Books");
             for (int i = 0; i < bookShelf.length; i++) {
                 for (int j = 0; j < bookShelf[i].length; j++) {
-                    writer.println(bookShelf[i][j].toString());
-
+                    if (bookShelf[i][j] != null) {
+                        writer.println(bookShelf[i][j].toString());
+                    }
                 }
-
             }
             System.out.println("Library contents saved to " + outputFile.getAbsolutePath());
         } catch (IOException exception) {
