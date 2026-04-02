@@ -1,5 +1,7 @@
 package CS2050Reschke.M03.Iteration01;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -45,7 +47,7 @@ abstract class Drone {
 
     @Override
     public String toString() {
-        return type + " - " + manufacturer + " | Year: " + year + " | Payload: " + payload +" kg";
+        return type + " - " + manufacturer + " | Year: " + year + " | Payload: " + payload + " kg";
     }
 }
 
@@ -78,7 +80,6 @@ class Hangar {
 
     }
 
-
     void displayCLI() {
         boolean exit = false;
         Scanner userInput = new Scanner(System.in);
@@ -92,11 +93,14 @@ class Hangar {
 
                 switch (userDecision) {
                     case 1:
-                        // Load drones from CSV
-
+                        // clear the drones array before parsing so we dont allow duplicating the list
+                        drones.clear();
+                        // TODO: Change this to input when done
+                        // Method to get input and return
+                        String fileName = "drones_test2.csv";
+                        loadFromCsv(fileName);
                         break;
                     case 2:
-                        // Display Hangar inventory
                         displayHangarInventory();
                         break;
                     case 3:
@@ -128,12 +132,144 @@ class Hangar {
 
     }
 
+
+    void loadFromCsv(String filename) {
+
+        int totalLinesRead = 0;
+        int blankLinesSkipped = 0;
+        int dronesAdded = 0;
+        int invalidLinesSkipped = 0;
+        int addFailures = 0;
+
+        try (Scanner fileScan = new Scanner(new File(filename))) {
+
+            while (fileScan.hasNextLine()) {
+                String line = fileScan.nextLine();
+                totalLinesRead++;
+                boolean shouldProcess = true;
+
+                if (line == null || line.trim().isEmpty()) {
+                    shouldProcess = false;
+                    blankLinesSkipped++;
+                }
+
+                if (shouldProcess) {
+                    Drone parsedDrone = parseDroneLine(line, totalLinesRead);
+                    if (parsedDrone == null) {
+                        invalidLinesSkipped++;
+                    } else {
+                        boolean added = addDrone(parsedDrone);
+                        if (added) {
+                            dronesAdded++;
+                        } else {
+                            addFailures++;
+                            System.out.println("Line " + totalLinesRead + ": could not add Drone");
+                        }
+                    }
+                }
+
+            }
+        } catch (FileNotFoundException exception) {
+            System.out.println("Error: File not found");
+            return;
+        }
+        System.out.println();
+        System.out.println("------------------------------------------------------------");
+        System.out.println("File Load Summary: " + filename);
+        System.out.println("------------------------------------------------------------");
+        System.out.println("Total lines read:            " + totalLinesRead);
+        System.out.println("Blank lines skipped:         " + blankLinesSkipped);
+        System.out.println("Invalid lines skipped:       " + invalidLinesSkipped);
+        System.out.println("Drones successfully added:   " + dronesAdded);
+        System.out.println("Add failures (library full): " + addFailures);
+        System.out.println("------------------------------------------------------------");
+        System.out.println();
+    }
+
+    private Drone parseDroneLine(String line, int lineNumber) {
+        String[] parts = line.split(",");
+
+        // if the csv has more or less than 4 parts of data reject it
+        if (parts.length != 4) {
+            System.out.println("Line " + lineNumber + ": wrong number of fields (need 4) " + line);
+            return null;
+        }
+
+        // Grab the data types from the csv file line
+        String droneTypeText = parts[0].trim();
+        String droneManufacturerText = parts[1].trim();
+        String droneYearText = parts[2].trim();
+        String dronePayloadText = parts[3].trim();
+
+        if (droneTypeText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing type");
+            return null;
+        }
+        if (droneManufacturerText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing manufacturer");
+            return null;
+        }
+        if (droneYearText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing year");
+            return null;
+        }
+        if (dronePayloadText.isEmpty()) {
+            System.out.println("Line " + lineNumber + ": missing payload");
+            return null;
+        }
+
+        // Convert the year and payload text to int and double
+        int year;
+        try {
+            year = Integer.parseInt(droneYearText);
+        } catch (NumberFormatException exception) {
+            System.out.println("Line " + lineNumber + ": year is not a number \"" + droneYearText + "\"");
+            return null;
+        }
+
+        // validate that the year is valid
+        if (year < 1900 || year > 2100) {
+            System.out.println("Line " + lineNumber + ": year is out of valid range " + year);
+            return null;
+        }
+
+        double payload;
+        try {
+            payload = Double.parseDouble(dronePayloadText);
+        } catch (NumberFormatException exception) {
+            System.out.println("Line " + lineNumber + ": Payload is not a number \"" + dronePayloadText + "\"");
+            return null;
+        }
+
+        // validate payload is a + number. Allowing 0 because drone could have no payload
+        if (payload < 0) {
+            System.out.println("Line " + lineNumber + ": Payload is not valid \"" + dronePayloadText + "\"");
+            return null;
+        }
+
+        if (droneTypeText.equalsIgnoreCase("S")) {
+            return new StandardDrone(droneTypeText, droneManufacturerText, year, payload);
+        } else if (droneTypeText.equalsIgnoreCase("P")) {
+            return new PriorityDrone(droneTypeText, droneManufacturerText, year, payload);
+        } else {
+            return null;
+        }
+
+    }
+
+    boolean addDrone(Drone parsedDrone) {
+        // Already verified that the data is valid so no more verification here
+        drones.add(parsedDrone);
+        return true;
+    }
+
     private void displayHangarInventory() {
 
         for (Drone drone : drones) {
             System.out.println(drone);
         }
     }
+
 }
 
 
