@@ -21,9 +21,9 @@ public class QueueTesting {
 
         // Test 2: queue()
         System.out.println("adding customers");
-        queue.queue(customer1);
-        queue.queue(customer2);
-        queue.queue(customer3);
+        queue.enqueue(customer1);
+        queue.enqueue(customer2);
+        queue.enqueue(customer3);
 
         System.out.println("Current queue:");
         queue.displayQueue();
@@ -86,7 +86,7 @@ class CustomerQueue<E> {
         queue = new ArrayList<>();
     }
 
-    public void queue(E item) {
+    public void enqueue(E item) {
         queue.add(item);
     }
 

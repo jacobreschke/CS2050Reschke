@@ -3,11 +3,16 @@ package CS2050Reschke.M02.Week1;
 public class InsertionSort {
 
     public static void main(String[] args) {
-        int[] array = new int[6];
+        int[] array = new int[4];
 
-        for (int i = 0; i < array.length; i++) {
+        array[0] = 8;
+        array[1] = 3;
+        array[2] = 5;
+        array[3] = 2;
 
-        }
+        /*for (int i = 0; i < array.length; i++) {
+
+        }*/
 
         printArray(array);
         insertionSort(array);
