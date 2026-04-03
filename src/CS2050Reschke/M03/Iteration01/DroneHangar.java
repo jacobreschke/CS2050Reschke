@@ -85,6 +85,13 @@ class Hangar {
         Scanner userInput = new Scanner(System.in);
         // do/while loop here because we know this will run at least once
         do {
+            System.out.println("1. Load Drones from CSV");
+            System.out.println("2. Display Hangar Inventory");
+            System.out.println("3. Search Drones (Manufacturer & Type)");
+            System.out.println("4. View Inventory Sorted by Payload (Manual Sort)");
+            System.out.println("5. View Inventory Sorted by Year (Manual Sort)");
+            System.out.println("6. Count Drones by Manufacturer");
+            System.out.println("7. Exit");
             System.out.print("Enter your choice (1-7): ");
 
             // if the user inputs an integer enter the switch/case
@@ -105,15 +112,24 @@ class Hangar {
                         break;
                     case 3:
                         // Search drones (mfg and type)
+                        // TODO: get input for mfg and type
+                        String manufacturer = "DJ1I";
+                        String type = "S";
+                        displayDronesByManufacturerAndType(type, manufacturer);
                         break;
                     case 4:
                         // View inventory sorted by payload capacity
+                        displayDronesByPayload();
                         break;
                     case 5:
                         // view inventory sorted by year
+                        displayDronesByYear();
                         break;
                     case 6:
                         // Count drones by manufacturer
+                        // TODO: Get user input for count
+                        String key = "DJI";
+                        displayManufacturerCount(key);
                         break;
                     case 7:
                         // Exit
@@ -130,6 +146,33 @@ class Hangar {
             }
         } while (!exit);
 
+    }
+
+
+    private void displayDronesByPayload() {
+    }
+
+    private void displayDronesByYear() {
+    }
+
+    private void displayDronesByManufacturerAndType(String type, String manufacturer) {
+
+        for (Drone drone : drones) {
+            if (drone.getType().equals(type) && drone.getManufacturer().equals(manufacturer)) {
+                System.out.println(drone);
+            }
+        }
+
+    }
+
+    private void displayManufacturerCount(String key) {
+        int count = 0;
+        for (Drone drone : drones) {
+            if (drone.getManufacturer().equals(key)) {
+                count++;
+            }
+        }
+        System.out.println(key + " appears: " + count + " times.");
     }
 
 
