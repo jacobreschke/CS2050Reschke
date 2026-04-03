@@ -9,6 +9,6 @@ public class PriorityDrone extends Drone {
     // Showing override
     @Override
     public String toString() {
-        return super.toString();
+        return "Priority" + super.toString();
     }
 }

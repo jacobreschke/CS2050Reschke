@@ -6,6 +6,8 @@ import CS2050Reschke.M03.Iteration01.PriorityDrone;
 import CS2050Reschke.M03.Iteration01.StandardDrone;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class HangarTest {
@@ -22,33 +24,71 @@ class HangarTest {
     }
 
     @Test
-    void testParseInvalidType(){
+    void testParseInvalidType() {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("a,DJI,2021,12.5", 1);
         assertNull(drone);
     }
 
     @Test
-    void testParseInvalidYear(){
+    void testParseValidTypeButFullWordStandard() {
+        // Found a bug here, If the user attempts to enter a drone that is "Standard" it should be allowed
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("Standard,DJI,2021,12.5", 1);
+        assertNotNull(drone);
+    }
+
+    @Test
+    void testParseValidTypeButFullWordPriority() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("Priority,DJI,2021,12.5", 1);
+        assertNotNull(drone);
+    }
+
+    @Test
+    void testParseEmptyDrone() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine(",,,", 1);
+        assertNull(drone);
+    }
+
+    @Test
+    void testParseEmptyString() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("", 1);
+        assertNull(drone);
+    }
+
+    @Test
+    void testParseWhitespaceOnly() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("   ", 1);
+        assertNull(drone);
+    }
+
+    @Test
+    void testParseInvalidYear() {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("S,DJI,twenty,12.5", 1);
         assertNull(drone);
     }
+
     @Test
-    void testParseInvalidPayload(){
+    void testParseInvalidPayload() {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("S,DJI,2021,-12.5", 1);
         assertNull(drone);
     }
+
     @Test
-    void testParseZeroKGPayload(){
+    void testParseZeroKGPayload() {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("S,DJI,2021,0.0", 1);
         assertNotNull(drone);
     }
 
     @Test
-    void testParseLowercaseTypeStandard() {
+    void testParseLowercaseTypeStandardAccepted() {
         // if (droneTypeText.equalsIgnoreCase("S")) {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("s,DJI,2021,12.5", 1);
@@ -56,12 +96,29 @@ class HangarTest {
     }
 
     @Test
-    void testParseLowercaseTypePriority() {
+    void testParseLowercaseTypePriorityAccepted() {
         // if (droneTypeText.equalsIgnoreCase("P")) {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("p,DJI,2021,12.5", 1);
         assertNotNull(drone);
     }
+
+    @Test
+    void testParseLowercaseTypeStandardIsUpper() {
+        // if (droneTypeText.equalsIgnoreCase("S")) {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("s,DJI,2021,12.5", 1);
+        assertEquals("S", drone.getType());
+    }
+
+    @Test
+    void testParseLowercaseTypePriorityIsUpper() {
+        // if (droneTypeText.equalsIgnoreCase("P")) {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("p,DJI,2021,12.5", 1);
+        assertEquals("P", drone.getType());
+    }
+
 
     @Test
     void testParseExtraSpaces() {
@@ -73,8 +130,19 @@ class HangarTest {
          */
 
         Hangar hangar = new Hangar();
-        Drone drone = hangar.parseDroneLine("P   ,   DJI,2021  , 12.5", 1);
-        assertNotNull(drone);
+        Drone drone = hangar.parseDroneLine("   P   ,   DJI,2021  ,  12.5   ", 1);
+        assertEquals("P", drone.getType());
+        assertEquals("DJI", drone.getManufacturer());
+        assertEquals(2021, drone.getYear());
+        assertEquals(12.5, drone.getPayload());
+    }
+
+    @Test
+    void testParseLowercaseTypeToUpperCase() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("p,DJI,2021,12.5", 1);
+        assertEquals("P", drone.getType());
+
     }
 
     @Test
@@ -85,7 +153,7 @@ class HangarTest {
     }
 
     @Test
-    void testParseInvalidManufacturer(){
+    void testParseInvalidManufacturer() {
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("S,,2021,12.5", 1);
         assertNull(drone);
@@ -120,10 +188,10 @@ class HangarTest {
     }
 
     @Test
-    void testParseNonIntYear() {
+    void testParseIntPayload() {
         Hangar hangar = new Hangar();
-        Drone drone = hangar.parseDroneLine("S,DJI,asdf,12.5", 1);
-        assertNull(drone);
+        Drone drone = hangar.parseDroneLine("S,DJI,2021,12", 1);
+        assertNotNull(drone);
     }
 
     @Test
@@ -150,21 +218,112 @@ class HangarTest {
     }
 
     @Test
-    void testParseManufacturerWithSpacesInName() {
+    void testParseYearMinimumBound() {
+        // if (year < 1900 || year > 2100)
         Hangar hangar = new Hangar();
-        Drone drone = hangar.parseDroneLine("S,Autel Robotics,2021,12.5", 1);
+        Drone drone = hangar.parseDroneLine("S,DJI,1900,12.5", 1);
         assertNotNull(drone);
     }
 
     @Test
-    void testAddDrone() {
+    void testParseYearMaximumBound() {
+        // if (year < 1900 || year > 2100)
         Hangar hangar = new Hangar();
-        Drone drone = hangar.parseDroneLine("S,DJI,2021,12.5", 1);
-
-        hangar.addDrone(drone);
-
-        assertTrue(hangar.getDrones().contains(drone));
+        Drone drone = hangar.parseDroneLine("S,DJI,2100,12.5", 1);
+        assertNotNull(drone);
     }
+
+    @Test
+    void testParseManufacturerWithSpacesInsideName() {
+        Hangar hangar = new Hangar();
+        Drone drone = hangar.parseDroneLine("S,Autel Robotics,2021,12.5", 1);
+        assertEquals("Autel Robotics", drone.getManufacturer());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeOneDrone() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+        ArrayList<Drone> testDrones = hangar.displayDronesByTypeAndManufacturer("S", "DJI");
+        assertEquals(testDrones.size(), hangar.getDrones().size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeBySingleLetterType() {
+        // My first version of this and the following search by MFG & type tests compared a single element with each
+        // other and always returned a pass which was incorrect logic
+        // I needed to add a bad element and a good element and confirm size 1
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByMultipleLetterTypeStandard() {
+        // Found another bug on this one, Couldn't search by "Standard" only "S"
+        // Fixed by converting Standard to S and Priority to P
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Standard", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByMultipleLetterTypePriority() {
+        Hangar hangar = new Hangar();
+
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Priority", "DJI");
+        assertEquals(1, drones.size());
+    }
+    @Test
+    void testSearchByManufacturerAndTypeLowerCaseManufacturer() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "dji");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeMultipleDrones() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "DJI", 2019, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("S", "DJI");
+        assertEquals(drones.size(), hangar.getDrones().size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeIncorrectInput() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("DJI", "Standard");
+        assertEquals(0, drones.size());
+    }
+
+
 
 
     @Test
@@ -192,8 +351,73 @@ class HangarTest {
     }
 
     @Test
+    void testEmptyArraySortByYear() {
+        Hangar hangar = new Hangar();
+        Drone[] sortedDrones = hangar.sortDronesByYear();
+        assertEquals(0, sortedDrones.length);
+    }
+
+    @Test
+    void testAlreadySortedArrayYear() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2019, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 10));
+
+        Drone[] sortedDrones = hangar.sortDronesByYear();
+
+        assertEquals(2017, sortedDrones[0].getYear());
+        assertEquals(2018, sortedDrones[1].getYear());
+        assertEquals(2019, sortedDrones[2].getYear());
+        assertEquals(2020, sortedDrones[3].getYear());
+        assertEquals(2021, sortedDrones[4].getYear());
+        assertEquals(2022, sortedDrones[5].getYear());
+    }
+
+    @Test
+    void testRandomArraySortingYear() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2019, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 10));
+
+        Drone[] sortedDrones = hangar.sortDronesByYear();
+
+        assertEquals(2017, sortedDrones[0].getYear());
+        assertEquals(2018, sortedDrones[1].getYear());
+        assertEquals(2019, sortedDrones[2].getYear());
+        assertEquals(2020, sortedDrones[3].getYear());
+        assertEquals(2021, sortedDrones[4].getYear());
+        assertEquals(2022, sortedDrones[5].getYear());
+    }
+
+    @Test
+    void testReturnedArrayIsSameSizeAsOriginalYear() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "Skydio", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "Parrot", 2020, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2019, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 10));
+
+        Drone[] sortedDrones = hangar.sortDronesByYear();
+
+        assertEquals(hangar.getDrones().size(), sortedDrones.length);
+    }
+
+    @Test
     void testOriginalListNotModifiedAfterYearSort() {
-        // Testing to make sure the original drones array isnt changed after calling sortDronesByYear()
+        // Testing to make sure the original drones array isn't changed after calling sortDronesByYear()
         Hangar hangar = new Hangar();
 
         hangar.addDrone(new StandardDrone("S", "DJI", 2022, 10));
@@ -204,7 +428,7 @@ class HangarTest {
         hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 10));
         hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 10));
 
-        Drone[] sorted = hangar.sortDronesByYear();
+        hangar.sortDronesByYear();
 
         // assert that hangar get drones array get index get year = original
         assertEquals(2022, hangar.getDrones().get(0).getYear());
@@ -216,18 +440,17 @@ class HangarTest {
     }
 
 
-
     @Test
     void testSortByPayload() {
         Hangar hangar = new Hangar();
 
-        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
         hangar.addDrone(new StandardDrone("S", "DJI", 2021, 21.0));
-        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 20.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 20.0));
 
-        hangar.addDrone(new PriorityDrone("P", "DJI", 2019, 19.0));
-        hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 18.0));
-        hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 17.0));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 19.0));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 18.0));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 17.0));
 
         Drone[] sorted = hangar.sortDronesByPayload();
 
@@ -240,7 +463,72 @@ class HangarTest {
     }
 
     @Test
-    void testOriginalListNotModifiedAfterPayloadSort() {
+    void testEmptyArraySortByPayload() {
+        Hangar hangar = new Hangar();
+        Drone[] sortedDrones = hangar.sortDronesByPayload();
+        assertEquals(0, sortedDrones.length);
+    }
+
+    @Test
+    void testAlreadySortedArrayPayload() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 11));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 12));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 13));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 14));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 15));
+
+        Drone[] sortedDrones = hangar.sortDronesByPayload();
+
+        assertEquals(10, sortedDrones[0].getPayload());
+        assertEquals(11, sortedDrones[1].getPayload());
+        assertEquals(12, sortedDrones[2].getPayload());
+        assertEquals(13, sortedDrones[3].getPayload());
+        assertEquals(14, sortedDrones[4].getPayload());
+        assertEquals(15, sortedDrones[5].getPayload());
+    }
+
+    @Test
+    void testRandomArraySortingPayload() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 15));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 11));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 13));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2021, 12));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 14));
+
+        Drone[] sortedDrones = hangar.sortDronesByPayload();
+
+        assertEquals(10, sortedDrones[0].getPayload());
+        assertEquals(11, sortedDrones[1].getPayload());
+        assertEquals(12, sortedDrones[2].getPayload());
+        assertEquals(13, sortedDrones[3].getPayload());
+        assertEquals(14, sortedDrones[4].getPayload());
+        assertEquals(15, sortedDrones[5].getPayload());
+    }
+
+    @Test
+    void testReturnedArrayIsSameSizeAsOriginalPayload() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 10));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "Skydio", 2020, 10));
+        hangar.addDrone(new StandardDrone("S", "Parrot", 2020, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2019, 10));
+        hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 10));
+
+        Drone[] sortedDrones = hangar.sortDronesByPayload();
+
+        assertEquals(hangar.getDrones().size(), sortedDrones.length);
+    }
+
+    @Test
+    void testOriginalArrayListNotModifiedAfterPayloadSort() {
         Hangar hangar = new Hangar();
 
         hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
@@ -251,7 +539,7 @@ class HangarTest {
         hangar.addDrone(new PriorityDrone("P", "DJI", 2018, 18.0));
         hangar.addDrone(new PriorityDrone("P", "DJI", 2017, 17.0));
 
-        Drone[] sorted = hangar.sortDronesByPayload();
+        hangar.sortDronesByPayload();
 
         assertEquals(22.0, hangar.getDrones().get(0).getPayload());
         assertEquals(21.0, hangar.getDrones().get(1).getPayload());
@@ -261,6 +549,48 @@ class HangarTest {
         assertEquals(17.0, hangar.getDrones().get(5).getPayload());
     }
 
+    @Test
+    void testAddDroneReturnsTrue() {
+        Hangar hangar = new Hangar();
+        assertTrue(hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0)));
+    }
 
+    @Test
+    void testDroneIsAdded() {
+        Hangar hangar = new Hangar();
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+        assertEquals(1, hangar.getDrones().size());
+    }
+
+    @Test
+    void testFindDuplicateDrone() {
+        Hangar hangar = new Hangar();
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+        assertTrue(hangar.findDuplicateDrone(new StandardDrone("S", "DJI", 2022, 22.0)));
+    }
+
+    @Test
+    void testDuplicateDroneNotAllowed() {
+        // found a bug in addDrone() while writing this test that allowed duplicates to be added
+        Hangar hangar = new Hangar();
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+        assertFalse(hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0)));
+        assertEquals(1, hangar.getDrones().size());
+    }
+
+    @Test
+    void testInsertionSortAlgorithm() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel", 2022, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+        Drone[] sortedArr = hangar.sortDronesByYear();
+
+        // This should take 2 drones with the same year but different mfg
+        // and when sorting keep them in the same original order
+        assertEquals(hangar.getDrones().get(0), sortedArr[0]);
+        assertEquals(hangar.getDrones().get(1), sortedArr[1]);
+    }
 
 }

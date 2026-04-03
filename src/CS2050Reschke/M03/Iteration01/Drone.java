@@ -33,6 +33,6 @@ public abstract class Drone {
 
     @Override
     public String toString() {
-        return type + " - " + manufacturer + " | Year: " + year + " | Payload: " + payload + " kg";
+        return " Drone - " + manufacturer + " | Year: " + year + " | Payload: " + payload + " kg";
     }
 }
