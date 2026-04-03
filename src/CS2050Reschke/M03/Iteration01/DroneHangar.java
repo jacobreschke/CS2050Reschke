@@ -102,8 +102,12 @@ class Hangar {
                     case 1:
                         // clear the drones array before parsing so we dont allow duplicating the list
                         drones.clear();
-                        // TODO: Change this to input when done
-                        // Method to get input and return
+                        // TODO: Method to get input and return into filename var
+                        /*
+                        Enter CSV file name: badfilename
+                        Error: File not found: badfilename
+                        Enter CSV file name: goodfilename
+                        */
                         String fileName = "drones_test2.csv";
                         loadFromCsv(fileName);
                         break;
@@ -113,7 +117,7 @@ class Hangar {
                     case 3:
                         // Search drones (mfg and type)
                         // TODO: get input for mfg and type
-                        String manufacturer = "DJ1I";
+                        String manufacturer = "DJI";
                         String type = "S";
                         displayDronesByManufacturerAndType(type, manufacturer);
                         break;
@@ -150,9 +154,82 @@ class Hangar {
 
 
     private void displayDronesByPayload() {
+        if (drones.isEmpty()) {
+            System.out.println("No drones in the hangar.");
+        } else {
+            sortedDrones = sortDronesByPayload();
+            System.out.println("Sorted Inventory By Payload:");
+            for (Drone drone : sortedDrones) {
+                System.out.println(drone);
+            }
+        }
+    }
+
+    private Drone[] sortDronesByPayload() {
+        // Create array of size drones array list
+        Drone[] array = new Drone[drones.size()];
+        // populate the new array with same elements of drones arraylist
+        for (int i = 0; i < drones.size(); i++) {
+            array[i] = drones.get(i);
+        }
+
+        for (int i = 1; i < array.length; i++) {
+
+            Drone current = array[i];      // Value we want to insert
+            double currentPayload = current.getPayload();
+            int j = i - 1;             // Start comparing with previous element
+
+            // Shift elements that are greater than current to the right
+            while (j >= 0 && array[j].getPayload() > currentPayload) {
+                array[j + 1] = array[j];
+                j--;
+            }
+
+            // Insert current value into correct position
+            array[j + 1] = current;
+        }
+
+        return array;
     }
 
     private void displayDronesByYear() {
+        if(drones.isEmpty()) {
+            System.out.println("No drones in the hangar");
+        } else {
+            sortedDrones = sortDronesByYear();
+            System.out.println("Sorted Inventory By Year:");
+            for (Drone drone : sortedDrones) {
+                System.out.println(drone);
+            }
+        }
+    }
+
+    private Drone[] sortDronesByYear() {
+
+        // Create array of size drones array list
+        Drone[] array = new Drone[drones.size()];
+        // populate the new array with same elements of drones arraylist
+        for (int i = 0; i < drones.size(); i++) {
+            array[i] = drones.get(i);
+        }
+
+        for (int i = 1; i < array.length; i++) {
+
+            Drone current = array[i];      // Value we want to insert
+            int currentYear = current.getYear();
+            int j = i - 1;             // Start comparing with previous element
+
+            // Shift elements that are greater than current to the right
+            while (j >= 0 && array[j].getYear() > currentYear) {
+                array[j + 1] = array[j];
+                j--;
+            }
+
+            // Insert current value into correct position
+            array[j + 1] = current;
+        }
+
+        return array;
     }
 
     private void displayDronesByManufacturerAndType(String type, String manufacturer) {
