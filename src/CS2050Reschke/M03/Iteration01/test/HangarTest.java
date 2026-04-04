@@ -12,6 +12,38 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class HangarTest {
 
+
+    @Test
+    void testValidFileName() {
+        // Make sure drones_test.csv is in the project directory
+        Hangar hangar = new Hangar();
+        String goodFileName = "drones_test.csv";
+        assertTrue(hangar.loadFromCsv(goodFileName));
+    }
+
+    @Test
+    void testInvalidFileName() {
+        Hangar hangar = new Hangar();
+        String badFileName = "badFileName.csv";
+        assertFalse(hangar.loadFromCsv(badFileName));
+    }
+
+    @Test
+    void testAllUpperCaseFileName() {
+        // Make sure drones_test.csv is in the project directory
+        Hangar hangar = new Hangar();
+        String goodFileName = "DRONES_TEST.CSV";
+        assertTrue(hangar.loadFromCsv(goodFileName));
+    }
+
+    @Test
+    void testAllLowerCaseFileName() {
+        // Make sure drones_test.csv is in the project directory
+        Hangar hangar = new Hangar();
+        String goodFileName = "drones_test.csv";
+        assertTrue(hangar.loadFromCsv(goodFileName));
+    }
+
     @Test
     void testParseValidDrone() {
         Hangar hangar = new Hangar();
@@ -240,6 +272,9 @@ class HangarTest {
         assertEquals("Autel Robotics", drone.getManufacturer());
     }
 
+
+
+
     @Test
     void testSearchByManufacturerAndTypeOneDrone() {
         Hangar hangar = new Hangar();
@@ -247,55 +282,6 @@ class HangarTest {
         hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
         ArrayList<Drone> testDrones = hangar.displayDronesByTypeAndManufacturer("S", "DJI");
         assertEquals(testDrones.size(), hangar.getDrones().size());
-    }
-
-    @Test
-    void testSearchByManufacturerAndTypeBySingleLetterType() {
-        // My first version of this and the following search by MFG & type tests compared a single element with each
-        // other and always returned a pass which was incorrect logic
-        // I needed to add a bad element and a good element and confirm size 1
-        Hangar hangar = new Hangar();
-
-        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
-        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
-
-        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "DJI");
-        assertEquals(1, drones.size());
-    }
-
-    @Test
-    void testSearchByManufacturerAndTypeByMultipleLetterTypeStandard() {
-        // Found another bug on this one, Couldn't search by "Standard" only "S"
-        // Fixed by converting Standard to S and Priority to P
-        Hangar hangar = new Hangar();
-
-        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
-        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
-
-        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Standard", "DJI");
-        assertEquals(1, drones.size());
-    }
-
-    @Test
-    void testSearchByManufacturerAndTypeByMultipleLetterTypePriority() {
-        Hangar hangar = new Hangar();
-
-
-        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
-        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
-
-        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Priority", "DJI");
-        assertEquals(1, drones.size());
-    }
-    @Test
-    void testSearchByManufacturerAndTypeLowerCaseManufacturer() {
-        Hangar hangar = new Hangar();
-
-        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
-        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
-
-        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "dji");
-        assertEquals(1, drones.size());
     }
 
     @Test
@@ -313,13 +299,154 @@ class HangarTest {
     }
 
     @Test
-    void testSearchByManufacturerAndTypeIncorrectInput() {
+    void testSearchByManufacturerAndTypeByUpperCaseTypeS() {
+        // My first version of this and the following search by MFG & type tests compared a single element with each
+        // other and always returned a pass which was incorrect logic
+        // I needed to add a bad element and a good element and confirm size 1
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("S", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByLowerCaseTypeS() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("s", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByUppercaseTypeP() {
+        // My first version of this and the following search by MFG & type tests compared a single element with each
+        // other and always returned a pass which was incorrect logic
+        // I needed to add a bad element and a good element and confirm size 1
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeLowerCaseTypeP() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("p", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByUpperCaseTypeStandard() {
+        // Found another bug on this one, Couldn't search by "Standard" only "S"
+        // Fixed by converting Standard to S and Priority to P
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Standard", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndByTypeLowerCaseTypeStandard() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("standard", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeByUpperCaseTypePriority() {
+        Hangar hangar = new Hangar();
+
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Priority", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeLowerCaseTypePriority() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("priority", "DJI");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeLowerCaseManufacturer() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("P", "dji");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeUpperCaseManufacturer() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("P", "DJI", 2021, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("S", "AUTEL ROBOTICS");
+        assertEquals(1, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeIncorrectTypeInput() {
         Hangar hangar = new Hangar();
 
         hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
         hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
 
-        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("DJI", "Standard");
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("a", "DJI");
+        assertEquals(0, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeIncorrectManufacturerInput() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("Standard", "asdf");
+        assertEquals(0, drones.size());
+    }
+
+    @Test
+    void testSearchByManufacturerAndTypeIncorrectBothInput() {
+        Hangar hangar = new Hangar();
+
+        hangar.addDrone(new StandardDrone("S", "Autel Robotics", 2021, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+        ArrayList<Drone> drones = hangar.displayDronesByTypeAndManufacturer("asdf", "asdf");
         assertEquals(0, drones.size());
     }
 
@@ -591,6 +718,23 @@ class HangarTest {
         // and when sorting keep them in the same original order
         assertEquals(hangar.getDrones().get(0), sortedArr[0]);
         assertEquals(hangar.getDrones().get(1), sortedArr[1]);
+    }
+
+
+    @Test
+    void testDisplayHangarInventoryHasDrones() {
+        Hangar hangar = new Hangar();
+        hangar.addDrone(new StandardDrone("S", "Autel", 2022, 22.0));
+        hangar.addDrone(new StandardDrone("S", "DJI", 2022, 22.0));
+
+        assertTrue(hangar.hasDrones());
+    }
+
+    @Test
+    void testDisplayHangarInventoryHasNoDrones() {
+        Hangar hangar = new Hangar();
+
+        assertFalse(hangar.hasDrones());
     }
 
 }

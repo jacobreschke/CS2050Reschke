@@ -18,6 +18,12 @@ public class Hangar {
         return drones;
     }
 
+    public String getUserInput() {
+        Scanner input = new Scanner(System.in);
+        String userInput = input.nextLine();
+        return userInput.trim();
+    }
+
 
     public void displayCLI() {
         boolean exit = false;
@@ -41,13 +47,9 @@ public class Hangar {
                     case 1:
                         // clear the drones array before parsing so we don't allow duplicating the list
                         drones.clear();
-                        // TODO: Method to get input and return into filename var
-                        /*
-                        Enter CSV file name: badfilename
-                        Error: File not found: badfilename
-                        Enter CSV file name: goodfilename
-                        */
-                        String fileName = "drones_test2.csv";
+
+                        System.out.print("Enter CSV file name: ");
+                        String fileName = getUserInput();
                         loadFromCsv(fileName);
                         break;
                     case 2:
@@ -55,9 +57,11 @@ public class Hangar {
                         break;
                     case 3:
                         // Search drones (mfg and type)
-                        // TODO: get input for mfg and type
-                        String manufacturer = "Autel Robotics";
-                        String type = "P";
+                        System.out.print("Enter manufacturer: ");
+                        String manufacturer = getUserInput();
+                        System.out.print("Enter drone type (Standard/Priority): ");
+                        String type = getUserInput();
+
                         displayDronesByTypeAndManufacturer(type, manufacturer);
                         break;
                     case 4:
@@ -70,8 +74,8 @@ public class Hangar {
                         break;
                     case 6:
                         // Count drones by manufacturer
-                        // TODO: Get user input for count
-                        String key = "DJI";
+                        System.out.print("Enter manufacturer to count: ");
+                        String key = getUserInput();
                         displayManufacturerCount(key);
                         break;
                     case 7:
@@ -93,7 +97,7 @@ public class Hangar {
 
 
     private void displayDronesByPayload() {
-        if (drones.isEmpty()) {
+        if (hasDrones()) {
             System.out.println("No drones in the hangar.");
         } else {
             sortedDrones = sortDronesByPayload();
@@ -106,7 +110,7 @@ public class Hangar {
 
     public Drone[] sortDronesByPayload() {
         // Chose insertion sort for both sorting algorithms because its faster(slightly) and it's
-        // possible that we get partially sorted drones
+        // possible that we get partially sorted drones and selection sort will mess that up
 
         // Create array of size drones array list
         Drone[] array = new Drone[drones.size()];
@@ -132,14 +136,14 @@ public class Hangar {
     }
 
     private void displayDronesByYear() {
-        if (drones.isEmpty()) {
-            System.out.println("No drones in the hangar");
-        } else {
+        if (hasDrones()) {
             sortedDrones = sortDronesByYear();
             System.out.println("Sorted Inventory By Year:");
             for (Drone drone : sortedDrones) {
                 System.out.println(drone);
             }
+        } else {
+            System.out.println("No drones in the hangar");
         }
     }
 
@@ -167,19 +171,24 @@ public class Hangar {
     public ArrayList<Drone> displayDronesByTypeAndManufacturer(String type, String manufacturer) {
         // I originally had this as void and just printing out the drones
         // but changed to return an arraylist so that I can unit test
-        if (type.equals("Standard")) {
+        if (type.equalsIgnoreCase("standard")) {
             type = "S";
-        } else if (type.equals("Priority")) {
+        } else if (type.equalsIgnoreCase("priority")) {
             type = "P";
         }
 
         ArrayList<Drone> returnDrones = new ArrayList<>();
+        boolean droneFound = false;
         for (Drone drone : drones) {
-            // Ignore case sensitivity
+            // Ignore case sensitivity so user can input lowercase and uppercase
             if (drone.getType().equalsIgnoreCase(type) && drone.getManufacturer().equalsIgnoreCase(manufacturer)) {
                 returnDrones.add(drone);
                 System.out.println(drone);
+                droneFound = true;
             }
+        }
+        if (!droneFound) {
+            System.out.println("No drones available.");
         }
         return returnDrones;
     }
@@ -195,7 +204,8 @@ public class Hangar {
     }
 
 
-    public void loadFromCsv(String filename) {
+    public boolean loadFromCsv(String filename) {
+        // I made this a boolean so that I could test good and bad file names
 
         int totalLinesRead = 0;
         int blankLinesSkipped = 0;
@@ -232,7 +242,7 @@ public class Hangar {
             }
         } catch (FileNotFoundException exception) {
             System.out.println("Error: File not found");
-            return;
+            return false;
         }
         System.out.println();
         System.out.println("------------------------------------------------------------");
@@ -245,6 +255,7 @@ public class Hangar {
         System.out.println("Add failures (library full): " + addFailures);
         System.out.println("------------------------------------------------------------");
         System.out.println();
+        return true;
     }
 
     public Drone parseDroneLine(String line, int lineNumber) {
@@ -280,7 +291,7 @@ public class Hangar {
             return null;
         }
 
-        // Convert the year and payload text to int and double
+        // Convert the year to int
         int year;
         try {
             year = Integer.parseInt(droneYearText);
@@ -295,6 +306,7 @@ public class Hangar {
             return null;
         }
 
+        // convert payload to double
         double payload;
         try {
             payload = Double.parseDouble(dronePayloadText);
@@ -324,6 +336,7 @@ public class Hangar {
     public boolean addDrone(Drone parsedDrone) {
         // loop through all current drones
         // Check if parsed drone is a duplicate
+        // return true/false for testing
         if (findDuplicateDrone(parsedDrone)) {
             return false;
         }
@@ -332,6 +345,7 @@ public class Hangar {
     }
 
     public boolean findDuplicateDrone(Drone parsedDrone) {
+        // linear search through drones, if duplicate is found return true, else return false
         for (Drone drone : drones) {
             if (parsedDrone.getType().equals(drone.getType()) &&
                     parsedDrone.getManufacturer().equals(drone.getManufacturer()) &&
@@ -346,10 +360,18 @@ public class Hangar {
     }
 
     public void displayHangarInventory() {
-
-        for (Drone drone : drones) {
-            System.out.println(drone);
+        if (hasDrones()) {
+            for (Drone drone : drones) {
+                System.out.println(drone);
+            }
         }
+        System.out.println("No drones in the hangar");
     }
+
+    public boolean hasDrones() {
+        // made purely for if checks in other methods and for testing
+        return !drones.isEmpty();
+    }
+
 
 }
