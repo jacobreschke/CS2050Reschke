@@ -24,7 +24,6 @@ public class Hangar {
         return userInput.trim();
     }
 
-
     public void displayCLI() {
         boolean exit = false;
         Scanner userInput = new Scanner(System.in);
@@ -94,7 +93,6 @@ public class Hangar {
         } while (!exit);
 
     }
-
 
     private void displayDronesByPayload() {
         if (hasDrones()) {
@@ -202,7 +200,6 @@ public class Hangar {
         }
         System.out.println(key + " appears: " + count + " times.");
     }
-
 
     public boolean loadFromCsv(String filename) {
         // I made this a boolean so that I could test good and bad file names
@@ -372,6 +369,5 @@ public class Hangar {
         // made purely for if checks in other methods and for testing
         return !drones.isEmpty();
     }
-
 
 }
