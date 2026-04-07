@@ -1,5 +1,8 @@
 package CS2050Reschke.M03.Iteration01;
 
+/**
+ * Concrete Standard Drone class that inherits from Drone
+ */
 public class StandardDrone extends Drone {
     // I dont see a reason with the user stories or design requirements to make change anything in the standard
     // or priority drones beyond overriding toString to display Standard or Priority before the rest
@@ -7,6 +10,10 @@ public class StandardDrone extends Drone {
         super(type, manufacturer, year, payload);
     }
 
+    /**
+     * toString override
+     * @return string displaying drone type Standard as a prefix to Drone toString
+     */
     @Override
     public String toString() {
         return "Standard" + super.toString();

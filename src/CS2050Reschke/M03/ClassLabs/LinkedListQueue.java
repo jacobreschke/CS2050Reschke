@@ -1,33 +1,29 @@
-/*
 package CS2050Reschke.M03.ClassLabs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
+public class LinkedListQueue {
 
-public class QueueTesting {
 
     public static void main(String[] args) {
-        CustomerQueue<Customer> queue = new CustomerQueue<>();
+        Queue<Customer> queue = new Queue<>();
 
-
-
-        // Create test customers
         Customer customer1 = new Customer("Name1", "Problem1");
         Customer customer2 = new Customer("Name2", "Problem2");
         Customer customer3 = new Customer("Name3", "Problem3");
 
-        // Test 1: isEmpty()
+
         System.out.println("Testing empty queue");
         System.out.println(queue.isEmpty());
         System.out.println();
 
-        // Test 2: queue()
         System.out.println("adding customers");
-        queue.enqueue(customer1);
-        queue.enqueue(customer2);
-        queue.enqueue(customer3);
+        queue.offer(customer1);
+        queue.offer(customer2);
+        queue.offer(customer3);
+        System.out.println();
 
         System.out.println("Current queue:");
         queue.displayQueue();
@@ -79,46 +75,39 @@ public class QueueTesting {
         } catch (NoSuchElementException e) {
             System.out.println(e.getMessage());
         }
+
     }
 }
 
+class Queue<E> {
+    LinkedList<E> queue;
 
-class CustomerQueue<E> {
-    ArrayList<E> queue;
-
-    CustomerQueue() {
-        queue = new ArrayList<>();
+    Queue() {
+        queue = new LinkedList<>();
     }
 
-    public void enqueue(E item) {
-        queue.add(item);
+    public void offer(E item) {
+        queue.offer(item);
     }
 
     public E dequeue() {
-        return queue.removeFirst();
+        return queue.poll();
     }
 
     public E peek() {
-        if (isEmpty()) {
-            throw new NoSuchElementException("Stack is empty.");
-        }
-        int bottomIndex = 0;
-        return queue.get(bottomIndex);
+        return queue.peek();
     }
-
 
     public boolean isEmpty() {
         return queue.isEmpty();
     }
 
     public void displayQueue() {
-        for (E item : queue ) {
-            System.out.println(item.toString());
+        for (E item : queue) {
+            System.out.println(item);
         }
     }
-
 }
-
 
 class Customer {
     String name;
@@ -134,4 +123,4 @@ class Customer {
     public String toString() {
         return "Customer Name: " + name + " Issue: " + issueType;
     }
-}*/
+}

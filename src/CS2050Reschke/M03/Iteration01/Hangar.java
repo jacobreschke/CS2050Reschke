@@ -5,49 +5,65 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Hangar class manages a collection of drone objects
+ * Allows loading, searching, sorting, and displaying drones
+ * by a command line interface
+ */
 public class Hangar {
 
     private ArrayList<Drone> drones = new ArrayList<>();
     private Drone[] sortedDrones;
 
+    Scanner input = new Scanner(System.in);
+
+
+    /**
+     * Default constructor
+     */
     public Hangar() {
 
     }
 
+    /**
+     * Returns the ArrayList of drones currently stored in the hangar
+     *
+     * @return ArrayList of Drone objects
+     */
     public ArrayList<Drone> getDrones() {
         return drones;
     }
 
+    /**
+     * Reads input from the user and returns in String type with whitespace trimmed
+     *
+     * @return trimmed user input: String
+     */
     public String getUserInput() {
-        Scanner input = new Scanner(System.in);
         String userInput = input.nextLine();
         return userInput.trim();
     }
 
+    /**
+     * Handles the command line interface options of the program
+     */
     public void displayCLI() {
         boolean exit = false;
-        Scanner userInput = new Scanner(System.in);
         // do/while loop here because we know this will run at least once
         do {
-            System.out.println("1. Load Drones from CSV");
-            System.out.println("2. Display Hangar Inventory");
-            System.out.println("3. Search Drones (Manufacturer & Type)");
-            System.out.println("4. View Inventory Sorted by Payload (Manual Sort)");
-            System.out.println("5. View Inventory Sorted by Year (Manual Sort)");
-            System.out.println("6. Count Drones by Manufacturer");
-            System.out.println("7. Exit");
-            System.out.print("Enter your choice (1-7): ");
+            displayCLIOptions();
 
-            // if the user inputs an integer enter the switch/case
-            if (userInput.hasNextInt()) {
-                int userDecision = userInput.nextInt();
+            // getUserInput() returns a string so we take as string and convert to int here that
+            // way we can reuse it for parts of the program that needs a string DRY/SRP
+            String userInput = getUserInput();
+            int userDecision = Integer.parseInt(userInput);
 
                 switch (userDecision) {
                     case 1:
                         // clear the drones array before parsing so we don't allow duplicating the list
                         drones.clear();
-
                         System.out.print("Enter CSV file name: ");
+
                         String fileName = getUserInput();
                         loadFromCsv(fileName);
                         break;
@@ -80,22 +96,39 @@ public class Hangar {
                     case 7:
                         // Exit
                         exit = true;
+                        input.close();
                         break;
                     default:
+                        // If user doesn't enter an int tell them to enter a number
+                        System.out.println("Invalid input, Please enter a number");
+                        // Clears input so we don't infinitely loop
+                        input.next();
+
                         break;
-                }
-            } else {
-                // If user doesn't enter an int tell them to enter a number
-                System.out.println("Invalid input, Please enter a number");
-                // Clears input so we don't infinitely loop
-                userInput.next();
             }
         } while (!exit);
 
     }
 
+    /**
+     * Displays the user options of the program
+     */
+    private void displayCLIOptions() {
+        System.out.println("1. Load Drones from CSV");
+        System.out.println("2. Display Hangar Inventory");
+        System.out.println("3. Search Drones (Manufacturer & Type)");
+        System.out.println("4. View Inventory Sorted by Payload (Manual Sort)");
+        System.out.println("5. View Inventory Sorted by Year (Manual Sort)");
+        System.out.println("6. Count Drones by Manufacturer");
+        System.out.println("7. Exit");
+        System.out.print("Enter your choice (1-7): ");
+    }
+
+    /**
+     * Displays all drones in the hangar sorted by payload
+     */
     private void displayDronesByPayload() {
-        if (hasDrones()) {
+        if (!hasDrones()) {
             System.out.println("No drones in the hangar.");
         } else {
             sortedDrones = sortDronesByPayload();
@@ -106,6 +139,12 @@ public class Hangar {
         }
     }
 
+    /**
+     * Populates an array the size of drones ArrayList and populates that array with
+     * drones in the same order as the drones ArrayList then sorts by payload
+     *
+     * @return Array of drones sorted by payload
+     */
     public Drone[] sortDronesByPayload() {
         // Chose insertion sort for both sorting algorithms because its faster(slightly) and it's
         // possible that we get partially sorted drones and selection sort will mess that up
@@ -133,6 +172,9 @@ public class Hangar {
         return array;
     }
 
+    /**
+     * Displays drones sorted by year
+     */
     private void displayDronesByYear() {
         if (hasDrones()) {
             sortedDrones = sortDronesByYear();
@@ -145,6 +187,12 @@ public class Hangar {
         }
     }
 
+    /**
+     * Populates an array the size of drones ArrayList and populates that array with
+     * drones in the same order as the drones ArrayList then sorts by year
+     *
+     * @return Array of drones sorted by year
+     */
     public Drone[] sortDronesByYear() {
         // See sortDronesByPayload for design choice and explanation of method
         Drone[] array = new Drone[drones.size()];
@@ -166,6 +214,14 @@ public class Hangar {
         return array;
     }
 
+    /**
+     * Filters and displays drones by type and manufacturer. Allows drone type by
+     * lowercase or full word and converts to "S" or "P"
+     *
+     * @param type the drones type ("S" or "P")
+     * @param manufacturer the drones manufacturer
+     * @return List of drones matching type and manufacturer
+     */
     public ArrayList<Drone> displayDronesByTypeAndManufacturer(String type, String manufacturer) {
         // I originally had this as void and just printing out the drones
         // but changed to return an arraylist so that I can unit test
@@ -191,6 +247,10 @@ public class Hangar {
         return returnDrones;
     }
 
+    /**
+     * Counts and displays how many drones match the given manufacturer
+     * @param key the manufacturer name to search
+     */
     public void displayManufacturerCount(String key) {
         int count = 0;
         for (Drone drone : drones) {
@@ -201,6 +261,13 @@ public class Hangar {
         System.out.println(key + " appears: " + count + " times.");
     }
 
+    /**
+     * Loads drone data from a CSV file
+     * validates each line and tracks the parsing to display results
+     *
+     * @param filename filename of the drones in csv format
+     * @return true if file loaded, false if no file found
+     */
     public boolean loadFromCsv(String filename) {
         // I made this a boolean so that I could test good and bad file names
 
@@ -241,6 +308,8 @@ public class Hangar {
             System.out.println("Error: File not found");
             return false;
         }
+        // I wanted to make this a helper function but I didnt want to feed 6 variables
+        // to a method. Design wise it seems kinda unnecessary.
         System.out.println();
         System.out.println("------------------------------------------------------------");
         System.out.println("File Load Summary: " + filename);
@@ -255,6 +324,13 @@ public class Hangar {
         return true;
     }
 
+    /**
+     * Parses a line of a CSV file and creates a Standard or Priority Drone object based on type
+     *
+     * @param line the actual line data of the CSV being parsed
+     * @param lineNumber the line number being parsed
+     * @return Drone object if valid line, null if invalid
+     */
     public Drone parseDroneLine(String line, int lineNumber) {
         String[] parts = line.split(",");
 
@@ -330,6 +406,11 @@ public class Hangar {
 
     }
 
+    /**
+     * Adds a drone to the hangar if it isnt a duplicate
+     * @param parsedDrone drone parsed by parseDroneLine()
+     * @return true if added successfully, false if a duplicate
+     */
     public boolean addDrone(Drone parsedDrone) {
         // loop through all current drones
         // Check if parsed drone is a duplicate
@@ -341,6 +422,12 @@ public class Hangar {
         return true;
     }
 
+    /**
+     * Searches the drone ArrayList and returns true if theres a duplicate
+     *
+     * @param parsedDrone drone you want to search for duplicates
+     * @return true if a duplicate exists, false if no duplicate was found.
+     */
     public boolean findDuplicateDrone(Drone parsedDrone) {
         // linear search through drones, if duplicate is found return true, else return false
         for (Drone drone : drones) {
@@ -356,15 +443,24 @@ public class Hangar {
         return false;
     }
 
+    /**
+     * Checks displays all drones currently in the hangar
+     * if no drones exists prints a message
+     */
     public void displayHangarInventory() {
         if (hasDrones()) {
             for (Drone drone : drones) {
                 System.out.println(drone);
             }
+        } else {
+            System.out.println("No drones in the hangar");
         }
-        System.out.println("No drones in the hangar");
     }
 
+    /**
+     * Checks if there are drones in the hangar
+     * @return true if there are drones, false if there are no drones
+     */
     public boolean hasDrones() {
         // made purely for if checks in other methods and for testing
         return !drones.isEmpty();
