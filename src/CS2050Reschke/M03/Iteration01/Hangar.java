@@ -56,7 +56,14 @@ public class Hangar {
             // getUserInput() returns a string so we take as string and convert to int here that
             // way we can reuse it for parts of the program that needs a string DRY/SRP
             String userInput = getUserInput();
-            int userDecision = Integer.parseInt(userInput);
+            int userDecision;
+
+            try {
+                userDecision = Integer.parseInt(userInput);
+            } catch (NumberFormatException exception) {
+                System.out.println("Invalid input. Please enter a number from 1 to 7.");
+                continue;
+            }
 
                 switch (userDecision) {
                     case 1:
