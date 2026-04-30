@@ -1,10 +1,8 @@
-package CS2050Reschke.M03.Week1; /**
+package CS2050Reschke.M03.ClassLabs; /**
  * Update code and add comments explaining concepts
  */
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PetAdoptionCenter {
     public static void main(String[] args) {

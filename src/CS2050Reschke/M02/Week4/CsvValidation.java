@@ -13,7 +13,6 @@ public class CsvValidation {
         // 2) Trim each field to eliminate extra white space
         String title = parts[0].trim();
 
-        Validate Required Text Field
         // 3) Validate required text fields
         if (title.isEmpty()) {
             System.out.println("Line " + lineNumber + ": missing title");
@@ -22,4 +21,5 @@ public class CsvValidation {
 
     }
 }
+
 */

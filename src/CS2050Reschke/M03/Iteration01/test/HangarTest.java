@@ -1,3 +1,4 @@
+/*
 package CS2050Reschke.M03.Iteration01.test;
 
 import CS2050Reschke.M03.Iteration01.Drone;
@@ -154,12 +155,14 @@ class HangarTest {
 
     @Test
     void testParseExtraSpaces() {
-        /*
+        */
+/*
         String droneTypeText = parts[0].trim();
         String droneManufacturerText = parts[1].trim();
         String droneYearText = parts[2].trim();
         String dronePayloadText = parts[3].trim();
-         */
+         *//*
+
 
         Hangar hangar = new Hangar();
         Drone drone = hangar.parseDroneLine("   P   ,   DJI,2021  ,  12.5   ", 1);
@@ -716,6 +719,7 @@ class HangarTest {
 
         // This should take 2 drones with the same year but different mfg
         // and when sorting keep them in the same original order
+        // and when sorting keep them in the same original order
         assertEquals(hangar.getDrones().get(0), sortedArr[0]);
         assertEquals(hangar.getDrones().get(1), sortedArr[1]);
     }
@@ -737,4 +741,4 @@ class HangarTest {
         assertFalse(hangar.hasDrones());
     }
 
-}
+}*/

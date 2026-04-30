@@ -1,4 +1,4 @@
-package CS2050Reschke.M04.Week1.Labs;
+package CS2050Reschke.M04.Labs;
 
 import java.util.*;
 
@@ -42,10 +42,8 @@ public class CollectionsSortBooks
 		// Step 4: Sort by year (newest to oldest)
 		System.out.println("Books sorted by year (newest to oldest):");
 
-		// TODO: Add code to sort books by year from newest to oldest
 		ArrayList<Book> sortedByYear = new ArrayList<>(bookInventory);
 		Collections.sort(sortedByYear, Comparator.comparing(Book::getYear).reversed());
-		// TODO: Print the books after sorting
 
 		for (Book book : sortedByYear) {
 			System.out.println(book);
@@ -55,11 +53,9 @@ public class CollectionsSortBooks
 		// Step 5: Sort by author, then title
 		System.out.println("Books sorted by author, then title:");
 
-		// TODO: Add code to sort books by author, then title
 		ArrayList<Book> sortedByAuthor = new ArrayList<>(bookInventory);
 		Collections.sort(sortedByAuthor, Comparator.comparing(Book::getAuthor).thenComparing(Book::getTitle));
 
-		// TODO: Print the books after sorting
 		for (Book book : sortedByAuthor) {
 			System.out.println(book);
 		}
@@ -100,13 +96,11 @@ public class CollectionsSortBooks
 	{
 		List<Book> results = new ArrayList<>();
 
-		// TODO: Add code to find books that match both author and year
 		for (Book book : inventory) {
 			if (author.equals(book.getAuthor()) && year == book.getYear()) {
 				results.add(book);
 			}
 		}
-		// TODO: Sort the matching books by title before returning
 		Collections.sort(results, Comparator.comparing(Book::getYear));
 
 		return results;

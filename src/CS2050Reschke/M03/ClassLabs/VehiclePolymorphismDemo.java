@@ -1,4 +1,4 @@
-package CS2050Reschke.M03.Week1; /**
+package CS2050Reschke.M03.ClassLabs; /**
  * Explore, debug to understand the concepts
  * Add comments explaining
  * Polymorphism with the Arraylist collection 
@@ -130,10 +130,7 @@ class HybridCar extends Vehicle implements Electric, GasPowered
 	}
 
 	@Override
-	public void refuelGas()
-	{
-		System.out.println("Refueling gas tank for " + getBrand());
-	}
+	public void refuelGas() { System.out.println("Refueling gas tank for " + getBrand()); }
 
 	@Override
 	public void refuel()
