@@ -36,16 +36,32 @@ public class Hangar {
         return drones;
     }
 
+    /**
+     * Returns the HashMap of drones stored in the hangar
+     *
+     * @return HashMap of Drone objects
+     */
     public HashMap<String, Drone> getDronesMap() {
         return dronesMap;
     }
 
+    /**
+     * Returns the Queue of Maintenance drones
+     * @return the drone maintenance queue
+     */
     public MaintenanceQueue<Drone> getDronesMaintenanceQueue() {
         return maintenanceQueue;
     }
 
 
+    /**
+     * Adds a drone to the maintenance queue if the drone isnt null and if it isnt already in the queue
+     *
+     * @param queueDrone The drone that should be added to the maintenanceQueue
+     * @return true if added, false if null or duplicate
+     */
     public boolean addDroneToQueue(Drone queueDrone) {
+        // This is a boolean for test purposes
         if (queueDrone == null) {
             return false;
         }
@@ -56,6 +72,12 @@ public class Hangar {
         return true;
     }
 
+    /**
+     * Gets the drone that matches the input key and outputs the drone
+     *
+     * @param idSearchKey The ID of the drone you wish to find
+     * @return the drone value that matches the key
+     */
     public Drone searchDroneById(String idSearchKey) {
         // This whole methods reason is so we can unit test
         if (idSearchKey == null) {
@@ -97,12 +119,11 @@ public class Hangar {
     /**
      * Filters and displays drones by type and manufacturer. Allows drone type by
      * lowercase or full word and converts to "S" or "P"
-     * <p>
      * The method only returns an ArrayList so that we can unit test it
      *
-     * @param type         the drones type ("S" or "P")
+     * @param type the drones type ("S" or "P")
      * @param manufacturer the drones manufacturer
-     * @return List of drones matching type and manufacturer
+     * @return ArrayList of drones matching type and manufacturer
      */
     public ArrayList<Drone> searchDronesByTypeAndManufacturer(String type, String manufacturer) {
         // Refactor: No longer prints the drone just finds and returns
@@ -214,6 +235,9 @@ public class Hangar {
     }
 
 
+    /**
+     * loops through the drone array and adds the drone to the HashMap of drones using the ID as the key
+     */
     private void createMapOfDrones() {
         // loading all valid drones into an ArrayList first then building the hashMap from that data
         // Design wise parsing data can turn into a big job so I want to let the program focus
@@ -225,6 +249,12 @@ public class Hangar {
     }
 
 
+    /**
+     * Optional treemap implementation. It creates a TreeMap of Key:String and Value:Drone ArrayList
+     * If the manufacturer doesnt exist, add it to the map, if mfg exists, add to the mfg array
+     *
+     * @return A populated TreeMap of drones sorted by manufacturer
+     */
     public TreeMap<String, ArrayList<Drone>> groupDronesByManufacturer() {
         // Extra treemap for drones stores data in key order
         // in this case the key is the mfg and the value is an arraylist of drones
@@ -355,7 +385,7 @@ public class Hangar {
             return false;
         }
 
-        for (Drone drone : maintenanceQueue) {
+        for (Drone drone : maintenanceQueue.getQueue()) {
             if (droneToAdd.getId().equals(drone.getId())) {
                 return true;
             }
@@ -374,42 +404,82 @@ public class Hangar {
         return !drones.isEmpty();
     }
 
+    /**
+     * Empties the drones array
+     */
     public void clearDronesArray() {
         drones.clear();
     }
 
+    /**
+     * Empties the drones Map
+     */
     public void clearDronesMap() {
         dronesMap.clear();
     }
 }
 
+/**
+ * This class uses Java's LinkedList to create a queue for the drone maintenance
+ *
+ * It uses a LinkedList for the Queue because its a much more efficient way to support
+ * a first in first out operation.
+ *
+ * @param <E>
+ */
+class MaintenanceQueue<E> {
 
-class MaintenanceQueue<E> implements Iterable<E> {
-    // Implements Iterable so that our checking for duplicates lets us use a for each loop
-    // It allows me to keep queue private and still loop the list
+    // Creates an empty LinkedList
+    private LinkedList<E> queue = new LinkedList<>();;
 
-    private LinkedList<E> queue;
 
-    MaintenanceQueue() {
-        queue = new LinkedList<>();
+    /**
+     * Gets the queue LinkedList and returns it
+     * @return
+     */
+    public LinkedList<E> getQueue() {
+        // The better design would be to implement Iterable because this method
+        // allows calling all LinkedList methods from it effectively removing the design choice
+        // of creating our own methods. But I dont remember us learning Iterable so I
+        // created a getter instead.
+        return queue;
     }
 
+    /**
+     * Adds to the end of the ArrayList
+     * @param item The generic(drone) that will be added
+     */
     public void offer(E item) {
         queue.offer(item);
     }
 
+    /**
+     * Removes and returns the generic(drone) at the end of the queue and returns it
+     * @return The generic that was removed
+     */
     public E dequeue() {
         return queue.poll();
     }
 
+    /**
+     * Checks the element at the front of the queue without removing it
+     * @return returns the generic(drone) at the front of the queue
+     */
     public E peek() {
         return queue.peek();
     }
 
+    /**
+     * Check if the queue is empty and returns true if empty, false if it contains anything
+     * @return true if empty, false if full
+     */
     public boolean isEmpty() {
         return queue.isEmpty();
     }
 
+    /**
+     * Loops through the queue if it contains elements
+     */
     public void displayQueue() {
         if (queue.isEmpty()) {
             System.out.println("Maintenance queue is empty");
@@ -419,24 +489,35 @@ class MaintenanceQueue<E> implements Iterable<E> {
         }
     }
 
-    @Override
-    public Iterator<E> iterator() {
-        return queue.iterator();
-    }
 }
 
+/**
+ * This Classes purpose is to separate the command line logic from the hangar logic.
+ * Separating the logic allows for easier debugging and adding/removing functionality from the
+ * command line
+ */
 class HangarConsole {
     // This class was created to separate the printing logic from the sorting/searching logic
     // This way if theres any bugs in the console output we know where to go
 
+    // Create an empty hangar
     private Hangar hangar;
     private Scanner input = new Scanner(System.in);
 
 
+    /**
+     * HangarConsole constructor takes in a hangar as input
+     * @param hangar The hangar that it is displaying the command line information for
+     */
     public HangarConsole(Hangar hangar) {
         this.hangar = hangar;
     }
 
+    /**
+     * This method is the entry to the program. It displays the command line
+     * of the program until the user enters 12 (exit). If the user doesnt enter
+     * a valid number it enters the default case where it tells the user to try again
+     */
     public void run() {
         // Entry point to the program. Similar to game development I'll have a Game.run() that
         // is the highest level of the program.
@@ -565,6 +646,9 @@ class HangarConsole {
         } while (!exit);
     }
 
+    /**
+     * Displays all drones sorted by payload
+     */
     private void displayDronesByPayload() {
 
         ArrayList<Drone> sortedDrones = hangar.sortDronesByPayload();
@@ -577,7 +661,9 @@ class HangarConsole {
         }
     }
 
-
+    /**
+     * Displays all drones sorted by year
+     */
     private void displayDronesByYear() {
 
         ArrayList<Drone> sortedDrones = hangar.sortDronesByYear();
@@ -590,6 +676,9 @@ class HangarConsole {
         }
     }
 
+    /**
+     * Displays the hangar current inventory unsorted
+     */
     private void displayHangarInventory() {
         if (hangar.hasDrones()) {
             displayDrones(hangar.getDrones());
@@ -598,6 +687,25 @@ class HangarConsole {
         }
     }
 
+    /**
+     * loops through the input array and prints the drones.
+     * @param drones the array of drones that will be printed to console
+     */
+    private void displayDrones(ArrayList<Drone> drones) {
+        // Refactor: Made this method so that I can call it inside the displayByYear/Payload methods
+        // as well as displayInventory()
+        if (drones.isEmpty()) {
+            System.out.println("No drones found.");
+        } else {
+            for (Drone drone : drones) {
+                System.out.println(drone);
+            }
+        }
+    }
+
+    /**
+     * Displays the options for the command line
+     */
     private void displayCLIOptions() {
         System.out.println("1. Load Drones from CSV");
         System.out.println("2. Display Hangar Inventory");
@@ -615,22 +723,18 @@ class HangarConsole {
         System.out.print("Enter your choice (1-13): ");
     }
 
+    /**
+     * Asks the user for input and returns in type string with whitespace trimmed
+     * @return String of user input
+     */
     public String getUserInput() {
         String userInput = input.nextLine();
         return userInput.trim();
     }
 
-    private void displayDrones(ArrayList<Drone> drones) {
-        // Refactor: Before I would loop and print multiple times, This helps DRY/SRP
-        // Also changed name to displayDrones to keep consistency with display methods
-        if (drones.isEmpty()) {
-            System.out.println("No drones found.");
-        } else {
-            for (Drone drone : drones) {
-                System.out.println(drone);
-            }
-        }
-    }
+    /**
+     * Display drones in a TreeMap sorted by manufacturer
+     */
     private void displayDronesGroupedByManufacturer() {
         // Fill the treemap
         TreeMap<String, ArrayList<Drone>> groupedDrones = hangar.groupDronesByManufacturer();
